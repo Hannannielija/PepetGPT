@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, jsonify
 
 
 google.generativeai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = google.generativeai.GenerativeModel("gemini-robotics-er-1.5-preview")
+model = google.generativeai.GenerativeModel("google/gemma-3-1b-it")
 
 
 app = Flask(__name__)
