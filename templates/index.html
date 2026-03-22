@@ -152,6 +152,7 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
       const chatBox = document.getElementById("chatBox");
@@ -198,6 +199,8 @@
         div.classList.add("message", type);
         if (type === "bot") {
           div.innerHTML = marked.parse(text);
+          // Render ulang simbol matematika setelah markdown diparse
+          MathJax.typesetPromise([div]);
         } else {
           div.textContent = text;
         }
