@@ -1,8 +1,9 @@
+import os
 import google.generativeai
 from flask import Flask, render_template, request, jsonify
 
 
-google.generativeai.configure(api_key="GEMINI_API_KEY")
+google.generativeai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = google.generativeai.GenerativeModel("gemini-robotics-er-1.5-preview")
 
 
