@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import google.generativeai
 from flask import Flask, render_template, request, jsonify
-
+#haiii para rakyat sipil
 
 google.generativeai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = google.generativeai.GenerativeModel("gemma-3-1b-it")
