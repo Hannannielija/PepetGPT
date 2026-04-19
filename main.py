@@ -38,6 +38,13 @@ def sitemap():
   </url>
 </urlset>''', 200, {'Content-Type': 'application/xml'}
 
+@app.route('/robots.txt')
+def robots():
+    return '''User-agent: *
+Allow: /
+Sitemap: https://pepetgpt.obr.my.id/sitemap.xml
+''', 200, {'Content-Type': 'text/plain'}
+
 
 
 if __name__ == "__main__":
