@@ -27,6 +27,17 @@ def chat():
     reply = chat_with_PepetGPT(user_message)
     return jsonify({"reply": reply})
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://pepetgpt.obr.my.id/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>''', 200, {'Content-Type': 'application/xml'}
+
 
 
 if __name__ == "__main__":
