@@ -554,20 +554,18 @@
     </style>
   </head>
   <style>
-.credit-left {
-    position: fixed;
-    bottom: 10px;
-    left: 15px;
-    font-size: 12px;
-    color: #777;
-    font-family: Arial, sans-serif;
-    z-index: 999;
-}
-</style>
+    .credit-left {
+      position: fixed;
+      bottom: 10px;
+      left: 15px;
+      font-size: 12px;
+      color: #777;
+      font-family: Arial, sans-serif;
+      z-index: 999;
+    }
+  </style>
 
-<div class="credit-left">
-    © 2026 — Credit by Ouroboros (Adrian)
-</div>
+  <div class="credit-left">© 2026 — Credit by Ouroboros (Adrian)</div>
   <body>
     <!-- Overlay -->
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -754,8 +752,11 @@
       }
 
       async function sendMessage() {
-        if (isProcessing) return;
-
+        if (isProcessing) {
+          userInput.value = "";
+          userInput.style.height = "auto";
+          return;
+        }
         const message = userInput.value.trim();
         if (!message) return;
 
