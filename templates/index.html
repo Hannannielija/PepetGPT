@@ -693,6 +693,7 @@
     <script>
       const userInput = document.getElementById("userInput");
       const sendBtn = document.getElementById("sendBtn");
+      let isProcessing = false;
       const messagesWrapper = document.getElementById("messagesWrapper");
       const welcomeScreen = document.getElementById("welcomeScreen");
       const sidebar = document.getElementById("sidebar");
@@ -738,9 +739,12 @@
       }
 
       async function sendMessage() {
+        if (isProcessing) return;
+
         const message = userInput.value.trim();
         if (!message) return;
 
+        isProcessing = true;
         welcomeScreen.style.display = "none";
         messagesWrapper.classList.add("visible");
 
@@ -757,12 +761,22 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message }),
           });
+
+          if (res.status === 429) {
+            loadingRow.remove();
+            appendBotMessage("⚠️ Terlalu banyak pesan. Tunggu sebentar ya!");
+            return;
+          }
+
           const data = await res.json();
           loadingRow.remove();
           appendBotMessage(data.reply);
         } catch (err) {
           loadingRow.remove();
           appendBotMessage("Terjadi kesalahan. Coba lagi!");
+        } finally {
+          isProcessing = false;
+          sendBtn.disabled = userInput.value.trim() === "";
         }
       }
 
