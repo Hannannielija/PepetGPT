@@ -7,7 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 google.generativeai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = google.generativeai.GenerativeModel("gemma-3-27b-it")
+model = google.generativeai.GenerativeModel("gemma-3-4b-it")
 
 
 app = Flask(__name__)
