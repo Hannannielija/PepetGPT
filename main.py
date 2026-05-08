@@ -1,14 +1,14 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
-import google.generativeai
+import google.genai
 from flask import Flask, render_template, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-google.generativeai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = google.generativeai.GenerativeModel("gemma-3-4b-it")
-
+client = genai.Client(
+    api_key=os.environ.get("GEMINI_API_KEY")
+)
 
 app = Flask(__name__)
 
@@ -19,10 +19,17 @@ limiter = Limiter(
 )
 
 def chat_with_PepetGPT(prompt):
-    response = model.generate_content(prompt)
-    return response.text.strip()
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
 
+        return response.text.strip()
 
+    except Exception as e:
+        print("ERROR GEMINI:", e)
+        return "Terjadi error pada AI."
 
 @app.route("/")
 def index():
