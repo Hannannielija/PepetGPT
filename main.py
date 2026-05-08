@@ -27,7 +27,7 @@ def chat_with_PepetGPT(prompt):
         print("PROMPT:", prompt)
 
         response = client.models.generate_content(
-            model="models/gemma-3-4b-it",
+            model="models/gemini-2.0-flash",
             contents=prompt
         )
 
