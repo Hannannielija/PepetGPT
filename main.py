@@ -24,16 +24,25 @@ limiter = Limiter(
 # Fungsi chat AI
 def chat_with_PepetGPT(prompt):
     try:
+        print("PROMPT:", prompt)
+
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt
         )
 
-        return response.text.strip()
+        print("RESPONSE:", response)
+
+        if hasattr(response, "text") and response.text:
+            return response.text.strip()
+
+        return "AI tidak memberi jawaban."
 
     except Exception as e:
-        print("ERROR GEMINI:", e)
-        return "Terjadi error pada AI."
+        import traceback
+        traceback.print_exc()
+
+        return f"ERROR: {str(e)}"
 
 # Halaman utama
 @app.route("/")
