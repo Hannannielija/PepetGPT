@@ -27,7 +27,7 @@ def chat_with_PepetGPT(prompt):
         print("PROMPT:", prompt)
 
         response = client.models.generate_content(
-            model="models/gemma-4-31b-it",
+            model="models/gemini-2.0-flash",
             contents=prompt
         )
 
@@ -36,13 +36,13 @@ def chat_with_PepetGPT(prompt):
         if hasattr(response, "text") and response.text:
             return response.text.strip()
 
-        return "AI tidak memberi jawaban."
+        return "AI tidak memberikan jawaban."
 
     except Exception as e:
         import traceback
         traceback.print_exc()
 
-        return f"ERROR: {str(e)}"
+        return f"Terjadi kesalahan AI: {str(e)}"
 
 # Halaman utama
 @app.route("/")
