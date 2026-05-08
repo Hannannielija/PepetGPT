@@ -757,14 +757,18 @@
           userInput.style.height = "auto";
           return;
         }
+
         const message = userInput.value.trim();
+
         if (!message) return;
 
         isProcessing = true;
+
         welcomeScreen.style.display = "none";
         messagesWrapper.classList.add("visible");
 
         appendUserMessage(message);
+
         userInput.value = "";
         userInput.style.height = "auto";
         sendBtn.disabled = true;
@@ -774,22 +778,58 @@
         try {
           const res = await fetch("/chat", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ message }),
           });
 
-          if (res.status === 429) {
+          // kalau status error
+          if (!res.ok) {
+            let errText = "⚠️ Server sedang bermasalah.";
+
+            try {
+              const errData = await res.json();
+
+              if (errData.reply) {
+                errText = errData.reply;
+              }
+
+              if (errData.error) {
+                errText = errData.error;
+              }
+            } catch {
+              errText = `⚠️ Error ${res.status}`;
+            }
+
             loadingRow.remove();
-            appendBotMessage("⚠️ Terlalu banyak pesan. Tunggu sebentar ya!");
+            appendBotMessage(errText);
             return;
           }
 
-          const data = await res.json();
+          // parse JSON aman
+          let data;
+
+          try {
+            data = await res.json();
+          } catch {
+            loadingRow.remove();
+            appendBotMessage("⚠️ Response server tidak valid.");
+            return;
+          }
+
           loadingRow.remove();
-          appendBotMessage(data.reply);
+
+          if (data.reply) {
+            appendBotMessage(data.reply);
+          } else {
+            appendBotMessage("⚠️ Tidak ada balasan dari AI.");
+          }
         } catch (err) {
+          console.error(err);
+
           loadingRow.remove();
-          appendBotMessage("Terjadi kesalahan. Coba lagi!");
+          appendBotMessage("⚠️ Gagal terhubung ke server.");
         } finally {
           isProcessing = false;
           sendBtn.disabled = userInput.value.trim() === "";
