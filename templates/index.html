@@ -39,7 +39,6 @@
         overflow: hidden;
       }
 
-      /* ===== SIDEBAR ===== */
       .sidebar {
         width: 260px;
         background: var(--sidebar-bg);
@@ -155,7 +154,6 @@
         color: var(--text);
       }
 
-      /* Overlay untuk mobile */
       .sidebar-overlay {
         display: none;
         position: fixed;
@@ -164,7 +162,6 @@
         z-index: 99;
       }
 
-      /* ===== MAIN ===== */
       .main {
         flex: 1;
         display: flex;
@@ -185,7 +182,7 @@
       .topbar-left {
         position: absolute;
         left: 12px;
-        display: none; /* hidden on desktop */
+        display: none;
       }
 
       .model-label {
@@ -197,7 +194,6 @@
         gap: 4px;
       }
 
-      /* ===== CHAT AREA ===== */
       .chat-area {
         flex: 1;
         overflow-y: auto;
@@ -212,7 +208,6 @@
         border-radius: 3px;
       }
 
-      /* Welcome */
       .welcome {
         display: flex;
         flex-direction: column;
@@ -266,7 +261,6 @@
         margin-bottom: 2px;
       }
 
-      /* Messages */
       .messages-wrapper {
         display: none;
         flex-direction: column;
@@ -397,6 +391,7 @@
         color: #abb2bf;
         font-size: 13px;
       }
+
       .bot-text strong {
         font-weight: 600;
       }
@@ -436,7 +431,6 @@
         }
       }
 
-      /* ===== INPUT ===== */
       .input-area {
         padding: 10px 16px 16px;
         display: flex;
@@ -512,7 +506,16 @@
         text-align: center;
       }
 
-      /* ===== MOBILE ===== */
+      .credit-left {
+        position: fixed;
+        bottom: 10px;
+        left: 15px;
+        font-size: 12px;
+        color: #777;
+        font-family: Arial, sans-serif;
+        z-index: 999;
+      }
+
       @media (max-width: 768px) {
         .sidebar {
           position: fixed;
@@ -521,56 +524,35 @@
           bottom: 0;
           transform: translateX(-100%);
         }
-
         .sidebar.open {
           transform: translateX(0);
           box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
         }
-
         .sidebar-overlay.active {
           display: block;
         }
-
         .topbar-left {
           display: flex;
         }
-
         .welcome-title {
           font-size: 20px;
         }
-
         .welcome-suggestions {
           grid-template-columns: 1fr;
         }
-
         .message-row.user .msg-content {
           max-width: 90%;
         }
-
         .input-footer {
           display: none;
         }
       }
     </style>
   </head>
-  <style>
-    .credit-left {
-      position: fixed;
-      bottom: 10px;
-      left: 15px;
-      font-size: 12px;
-      color: #777;
-      font-family: Arial, sans-serif;
-      z-index: 999;
-    }
-  </style>
-
-  <div class="credit-left">© 2026 — Credit by Ouroboros (Adrian)</div>
   <body>
-    <!-- Overlay -->
+    <div class="credit-left">© 2026 — Credit by Ouroboros (Adrian)</div>
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <span class="sidebar-logo">PepetGPT</span>
@@ -597,10 +579,8 @@
       </div>
     </div>
 
-    <!-- MAIN -->
     <div class="main">
       <div class="topbar">
-        <!-- Hamburger (mobile only) -->
         <div class="topbar-left">
           <button class="icon-btn" onclick="openSidebar()">
             <svg
@@ -630,7 +610,6 @@
         </div>
       </div>
 
-      <!-- CHAT AREA -->
       <div class="chat-area" id="chatArea">
         <div class="welcome" id="welcomeScreen">
           <div class="welcome-title">Apa yang ingin kamu tanyakan?</div>
@@ -670,7 +649,6 @@
         <div class="messages-wrapper" id="messagesWrapper"></div>
       </div>
 
-      <!-- INPUT -->
       <div class="input-area">
         <div class="input-wrapper">
           <textarea
@@ -698,7 +676,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-      MathJax = {
+      // ===== MATHJAX CONFIG =====
+      window.MathJax = {
         tex: {
           inlineMath: [
             ["$", "$"],
@@ -713,52 +692,49 @@
           skipHtmlTags: ["script", "noscript", "style", "textarea", "pre"],
         },
       };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-      marked.setOptions({
-        breaks: true,
-        gfm: true,
-      });
 
-      // Lindungi LaTeX sebelum diproses marked
-      const originalParse = marked.parse.bind(marked);
+      // ===== MARKED CONFIG + LATEX PROTECTION =====
+      marked.setOptions({ breaks: true, gfm: true });
+
+      const _origParse = marked.parse.bind(marked);
       marked.parse = function (text) {
         const blocks = [];
 
-        // Konversi [ ... ] ke \[ ... \] jika isinya LaTeX
+        // Konversi [ LaTeX ] -> \[ LaTeX \] sebelum marked merusaknya
         text = text.replace(/\[\s*([\s\S]*?)\s*\]/g, (match, inner) => {
-          if (/\\|frac|operatorname|\^|_|\{/.test(inner)) {
-            return "\\[" + inner + "\\]";
+          if (
+            /\\|frac|operatorname|cdot|qquad|varepsilon|prod|sum|int|boxed|text\{/.test(
+              inner,
+            )
+          ) {
+            return "\n\\[\n" + inner + "\n\\]\n";
           }
           return match;
         });
 
-        // Simpan semua blok LaTeX agar tidak diproses marked
+        // Simpan semua LaTeX agar tidak disentuh marked
         text = text.replace(
-          /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$\n]*?\$/g,
+          /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$\n]{1,300}\$/g,
           (match) => {
             blocks.push(match);
-            return `LATEXBLOCK${blocks.length - 1}ENDBLOCK`;
+            return `LXBL${blocks.length - 1}ENDLX`;
           },
         );
 
-        let result = originalParse(text);
-        result = result.replace(
-          /LATEXBLOCK(\d+)ENDBLOCK/g,
-          (_, i) => blocks[i],
-        );
+        let result = _origParse(text);
+        result = result.replace(/LXBL(\d+)ENDLX/g, (_, i) => blocks[i]);
         return result;
       };
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
       const userInput = document.getElementById("userInput");
       const sendBtn = document.getElementById("sendBtn");
-      let isProcessing = false;
       const messagesWrapper = document.getElementById("messagesWrapper");
       const welcomeScreen = document.getElementById("welcomeScreen");
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
+      let isProcessing = false;
 
       function openSidebar() {
         sidebar.classList.add("open");
@@ -807,16 +783,12 @@
         }
 
         const message = userInput.value.trim();
-
         if (!message) return;
 
         isProcessing = true;
-
         welcomeScreen.style.display = "none";
         messagesWrapper.classList.add("visible");
-
         appendUserMessage(message);
-
         userInput.value = "";
         userInput.style.height = "auto";
         sendBtn.disabled = true;
@@ -826,38 +798,29 @@
         try {
           const res = await fetch("/chat", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message }),
           });
 
-          // kalau status error
+          if (res.status === 429) {
+            loadingRow.remove();
+            appendBotMessage("⚠️ Terlalu banyak pesan. Tunggu sebentar ya!");
+            return;
+          }
+
           if (!res.ok) {
             let errText = "⚠️ Server sedang bermasalah.";
-
             try {
               const errData = await res.json();
-
-              if (errData.reply) {
-                errText = errData.reply;
-              }
-
-              if (errData.error) {
-                errText = errData.error;
-              }
-            } catch {
-              errText = `⚠️ Error ${res.status}`;
-            }
-
+              errText =
+                errData.error || errData.reply || `⚠️ Error ${res.status}`;
+            } catch {}
             loadingRow.remove();
             appendBotMessage(errText);
             return;
           }
 
-          // parse JSON aman
           let data;
-
           try {
             data = await res.json();
           } catch {
@@ -867,15 +830,9 @@
           }
 
           loadingRow.remove();
-
-          if (data.reply) {
-            appendBotMessage(data.reply);
-          } else {
-            appendBotMessage("⚠️ Tidak ada balasan dari AI.");
-          }
+          appendBotMessage(data.reply || "⚠️ Tidak ada balasan dari AI.");
         } catch (err) {
           console.error(err);
-
           loadingRow.remove();
           appendBotMessage("⚠️ Gagal terhubung ke server.");
         } finally {
@@ -896,9 +853,9 @@
         const row = document.createElement("div");
         row.className = "message-row";
         row.innerHTML = `
-        <div class="msg-avatar bot-avatar">P</div>
-        <div class="msg-content"><div class="loading-dots"><span></span><span></span><span></span></div></div>
-      `;
+          <div class="msg-avatar bot-avatar">P</div>
+          <div class="msg-content"><div class="loading-dots"><span></span><span></span><span></span></div></div>
+        `;
         messagesWrapper.appendChild(row);
         scrollToBottom();
         return row;
