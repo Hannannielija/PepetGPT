@@ -725,13 +725,24 @@
       const originalParse = marked.parse.bind(marked);
       marked.parse = function (text) {
         const blocks = [];
+
+        // Konversi [ ... ] ke \[ ... \] jika isinya LaTeX
+        text = text.replace(/\[\s*([\s\S]*?)\s*\]/g, (match, inner) => {
+          if (/\\|frac|operatorname|\^|_|\{/.test(inner)) {
+            return "\\[" + inner + "\\]";
+          }
+          return match;
+        });
+
+        // Simpan semua blok LaTeX agar tidak diproses marked
         text = text.replace(
-          /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$]*?\$/g,
+          /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$\n]*?\$/g,
           (match) => {
             blocks.push(match);
             return `LATEXBLOCK${blocks.length - 1}ENDBLOCK`;
           },
         );
+
         let result = originalParse(text);
         result = result.replace(
           /LATEXBLOCK(\d+)ENDBLOCK/g,
