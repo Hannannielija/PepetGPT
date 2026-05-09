@@ -701,25 +701,23 @@
         const blocks = [];
 
         // Konversi [ LaTeX ] -> \[ LaTeX \] sebelum marked merusaknya
-        text = text.replace(/\[\s*([\s\S]*?)\s*\]/g, (match, inner) => {
-          // Deteksi LaTeX — lebih luas
-          if (
-            /\\|\^|_{|frac|operatorname|cdot|qquad|varepsilon|prod|sum|int|boxed|text\{|sqrt|times|leq|geq|neq|approx|infty|partial|nabla|alpha|beta|gamma|delta|epsilon|theta|lambda|mu|pi|sigma|omega/.test(
-              inner,
-            )
-          ) {
-            return "\n\\[\n" + inner + "\n\\]\n";
-          }
-          // Jika baris pendek dan ada simbol matematika seperti = + - *
-          if (
-            inner.length < 80 &&
-            /[=+\-*/^_]/.test(inner) &&
-            !/https?:|<|>/.test(inner)
-          ) {
-            return "\n\\[\n" + inner + "\n\\]\n";
-          }
-          return match;
-        });
+        const _origParse = marked.parse.bind(marked);
+        marked.parse = function (text) {
+          const blocks = [];
+
+          // Simpan semua LaTeX agar tidak disentuh marked
+          text = text.replace(
+            /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$\n]{1,300}\$/g,
+            (match) => {
+              blocks.push(match);
+              return `LXBL${blocks.length - 1}ENDLX`;
+            },
+          );
+
+          let result = _origParse(text);
+          result = result.replace(/LXBL(\d+)ENDLX/g, (_, i) => blocks[i]);
+          return result;
+        };
         // Simpan semua LaTeX agar tidak disentuh marked
         text = text.replace(
           /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$\n]{1,300}\$/g,
