@@ -23,7 +23,7 @@ limiter = Limiter(
 def chat_with_PepetGPT(prompt):
     try:
         response = client.chat.completions.create(
-            model="openrouter/auto",
+            model="mistralai/mistral-7b-instruct:free",
             messages=[
                 {
                     "role": "user",
