@@ -716,6 +716,31 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+      });
+
+      // Lindungi LaTeX sebelum diproses marked
+      const originalParse = marked.parse.bind(marked);
+      marked.parse = function (text) {
+        const blocks = [];
+        text = text.replace(
+          /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^\$]*?\$/g,
+          (match) => {
+            blocks.push(match);
+            return `LATEXBLOCK${blocks.length - 1}ENDBLOCK`;
+          },
+        );
+        let result = originalParse(text);
+        result = result.replace(
+          /LATEXBLOCK(\d+)ENDBLOCK/g,
+          (_, i) => blocks[i],
+        );
+        return result;
+      };
+    </script>
+    <script>
       const userInput = document.getElementById("userInput");
       const sendBtn = document.getElementById("sendBtn");
       let isProcessing = false;
