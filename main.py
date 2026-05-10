@@ -20,6 +20,7 @@ limiter = Limiter(
     default_limits=[]
 )
 
+
 def chat_with_PepetGPT(prompt):
     try:
         response = client.chat.completions.create(
