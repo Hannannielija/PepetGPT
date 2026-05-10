@@ -2,7 +2,10 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
     <title>PepetGPT</title>
 
     <style>
@@ -24,12 +27,21 @@
         box-sizing: border-box;
       }
 
+      html,
       body {
-        font-family: Arial, sans-serif;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
         background: var(--bg);
         color: var(--text);
-        height: 100vh;
-        overflow: hidden;
+      }
+
+      body {
         display: flex;
       }
 
@@ -41,38 +53,53 @@
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        transition: transform 0.3s ease;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
         z-index: 1000;
       }
 
       .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 14px;
         border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
       }
 
       .sidebar-title {
-        font-size: 18px;
-        font-weight: bold;
+        font-size: 15px;
+        font-weight: 700;
       }
 
       .sidebar-content {
-        padding: 10px;
         flex: 1;
         overflow-y: auto;
+        padding: 10px;
+      }
+
+      .new-chat-btn {
+        width: 100%;
+        border: none;
+        background: var(--input-bg);
+        color: var(--text);
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .new-chat-btn:hover {
+        background: var(--btn-hover);
       }
 
       .chat-item {
-        padding: 12px;
+        padding: 10px;
         border-radius: 10px;
         cursor: pointer;
-        margin-bottom: 8px;
-        background: transparent;
         color: var(--text-muted);
-        transition: 0.2s;
-        user-select: none;
+        font-size: 14px;
+        margin-bottom: 4px;
       }
 
       .chat-item:hover {
@@ -80,23 +107,27 @@
         color: var(--text);
       }
 
-      .chat-item.active {
-        background: var(--btn-hover);
-        color: var(--text);
+      .sidebar-footer {
+        border-top: 1px solid var(--border);
+        padding: 14px;
       }
 
-      /* ================= OVERLAY ================= */
-
-      .overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        z-index: 999;
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
 
-      .overlay.show {
-        display: block;
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #19c37d, #0f766e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: bold;
       }
 
       /* ================= MAIN ================= */
@@ -105,7 +136,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        min-width: 0;
       }
 
       .topbar {
@@ -113,30 +144,29 @@
         border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 0 14px;
+        justify-content: center;
+        position: relative;
         flex-shrink: 0;
+      }
+
+      .menu-btn {
+        position: absolute;
+        left: 14px;
+        border: none;
+        background: none;
+        color: var(--text);
+        cursor: pointer;
+        display: none;
+      }
+
+      .menu-btn svg {
+        width: 24px;
+        height: 24px;
       }
 
       .topbar-title {
-        font-size: 18px;
-        font-weight: bold;
-      }
-
-      .icon-btn {
-        width: 38px;
-        height: 38px;
-        border: none;
-        border-radius: 10px;
-        background: transparent;
-        color: var(--text);
-        cursor: pointer;
-        transition: 0.2s;
-        flex-shrink: 0;
-      }
-
-      .icon-btn:hover {
-        background: var(--btn-hover);
+        font-size: 15px;
+        font-weight: 600;
       }
 
       /* ================= CHAT ================= */
@@ -144,177 +174,153 @@
       .chat-area {
         flex: 1;
         overflow-y: auto;
-        padding: 20px 14px;
+        padding: 20px;
       }
 
-      .messages-wrapper {
-        width: 100%;
+      .messages {
         max-width: 800px;
         margin: auto;
       }
 
-      .message-row {
+      .message {
         display: flex;
-        gap: 10px;
         margin-bottom: 20px;
       }
 
-      .message-row.user {
+      .message.user {
         justify-content: flex-end;
       }
 
-      .msg-avatar {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: var(--accent);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        font-weight: bold;
-        flex-shrink: 0;
-      }
-
-      .msg-content {
+      .bubble {
         max-width: 85%;
-      }
-
-      .user-bubble {
-        background: var(--user-bubble);
-        padding: 12px 15px;
-        border-radius: 18px;
+        padding: 12px 16px;
+        border-radius: 16px;
         line-height: 1.6;
         word-break: break-word;
       }
 
-      .bot-text {
-        line-height: 1.7;
-        word-break: break-word;
+      .user .bubble {
+        background: var(--user-bubble);
       }
 
-      .bot-text pre {
-        background: #111;
-        padding: 12px;
-        border-radius: 10px;
-        overflow-x: auto;
-        margin-top: 10px;
+      .bot .bubble {
+        background: transparent;
       }
 
-      .bot-text code {
-        color: #f7d774;
+      .welcome {
+        max-width: 700px;
+        margin: auto;
+        text-align: center;
+        padding-top: 80px;
+      }
+
+      .welcome h1 {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+
+      .welcome p {
+        color: var(--text-muted);
       }
 
       /* ================= INPUT ================= */
 
       .input-area {
+        padding: 16px;
         border-top: 1px solid var(--border);
-        padding: 14px;
-        flex-shrink: 0;
       }
 
-      .input-wrapper {
+      .input-box {
         max-width: 800px;
         margin: auto;
+        display: flex;
+        gap: 10px;
         background: var(--input-bg);
         border: 1px solid var(--border);
         border-radius: 16px;
         padding: 10px;
-        display: flex;
-        gap: 10px;
-        align-items: flex-end;
       }
 
       textarea {
         flex: 1;
-        background: transparent;
+        background: none;
         border: none;
         outline: none;
         resize: none;
-        color: white;
+        color: var(--text);
         font-size: 15px;
-        max-height: 180px;
-        min-height: 24px;
+        max-height: 140px;
       }
 
-      .send-btn {
+      button.send-btn {
         width: 42px;
         height: 42px;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
         background: white;
         color: black;
-        font-size: 18px;
         flex-shrink: 0;
-      }
-
-      /* ================= LOADING ================= */
-
-      .loading {
-        display: flex;
-        gap: 4px;
-        margin-top: 8px;
-      }
-
-      .loading span {
-        width: 6px;
-        height: 6px;
-        background: white;
-        border-radius: 50%;
-        animation: bounce 1.2s infinite;
-      }
-
-      .loading span:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-
-      .loading span:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-
-      @keyframes bounce {
-        0%,
-        80%,
-        100% {
-          transform: translateY(0);
-          opacity: 0.4;
-        }
-        40% {
-          transform: translateY(-5px);
-          opacity: 1;
-        }
       }
 
       /* ================= MOBILE ================= */
 
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+      }
+
+      .overlay.active {
+        display: block;
+      }
+
       @media (max-width: 768px) {
         .sidebar {
           position: fixed;
-          left: 0;
           top: 0;
+          left: 0;
           bottom: 0;
           transform: translateX(-100%);
         }
 
-        .sidebar.show {
+        .sidebar.open {
           transform: translateX(0);
         }
 
-        .msg-content {
-          max-width: 92%;
+        .menu-btn {
+          display: block;
         }
 
         .chat-area {
-          padding: 14px 10px;
+          padding: 14px;
+        }
+
+        .bubble {
+          max-width: 95%;
+          font-size: 14px;
+        }
+
+        .welcome {
+          padding-top: 50px;
+        }
+
+        .welcome h1 {
+          font-size: 22px;
         }
 
         .input-area {
           padding: 10px;
         }
 
-        .topbar {
-          padding: 0 10px;
+        .input-box {
+          border-radius: 14px;
+        }
+
+        textarea {
+          font-size: 16px;
         }
       }
     </style>
@@ -325,231 +331,192 @@
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-title">PepetGPT</div>
 
-        <button class="icon-btn" onclick="closeSidebar()">✕</button>
+        <button
+          onclick="closeSidebar()"
+          style="
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 22px;
+          "
+        >
+          ×
+        </button>
       </div>
 
       <div class="sidebar-content">
-        <div class="chat-item active" onclick="newChat()">+ Chat Baru</div>
+        <button class="new-chat-btn" onclick="newChat()">+ Chat Baru</button>
+
+        <div id="chatHistory"></div>
       </div>
-    </div>
+
+      <div class="sidebar-footer">
+        <div class="user-box">
+          <div class="avatar">P</div>
+          <div>PepetGPT User</div>
+        </div>
+      </div>
+    </aside>
 
     <!-- MAIN -->
-    <div class="main">
-      <!-- TOPBAR -->
+    <main class="main">
       <div class="topbar">
-        <button class="icon-btn" onclick="openSidebar()">☰</button>
+        <button class="menu-btn" onclick="openSidebar()">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+        </button>
 
         <div class="topbar-title">PepetGPT</div>
       </div>
 
-      <!-- CHAT -->
       <div class="chat-area" id="chatArea">
-        <div class="messages-wrapper" id="messagesWrapper"></div>
+        <div class="welcome" id="welcome">
+          <h1>Apa yang ingin kamu tanyakan?</h1>
+          <p>PepetGPT siap membantu kamu.</p>
+        </div>
+
+        <div class="messages" id="messages"></div>
       </div>
 
-      <!-- INPUT -->
       <div class="input-area">
-        <div class="input-wrapper">
+        <div class="input-box">
           <textarea
-            id="userInput"
+            id="input"
             rows="1"
             placeholder="Tanyakan sesuatu..."
           ></textarea>
 
-          <button class="send-btn" onclick="sendMessage()">↑</button>
+          <button class="send-btn" onclick="sendMessage()">➤</button>
         </div>
       </div>
-    </div>
+    </main>
 
-    <!-- MARKED -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <script>
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
+      const welcome = document.getElementById("welcome");
+      const historyBox = document.getElementById("chatHistory");
 
-      const userInput = document.getElementById("userInput");
-      const messagesWrapper = document.getElementById("messagesWrapper");
-      const chatArea = document.getElementById("chatArea");
-
-      // ================= SIDEBAR =================
+      let chatCount = 1;
 
       function openSidebar() {
-        sidebar.classList.add("show");
-        overlay.classList.add("show");
+        sidebar.classList.add("open");
+        overlay.classList.add("active");
       }
 
       function closeSidebar() {
-        sidebar.classList.remove("show");
-        overlay.classList.remove("show");
+        sidebar.classList.remove("open");
+        overlay.classList.remove("active");
       }
 
-      // ================= NEW CHAT =================
-
       function newChat() {
-        messagesWrapper.innerHTML = "";
+        messages.innerHTML = "";
+        welcome.style.display = "block";
+
+        const item = document.createElement("div");
+        item.className = "chat-item";
+        item.textContent = "Chat Baru " + chatCount++;
+        historyBox.prepend(item);
 
         closeSidebar();
       }
 
-      // ================= AUTO RESIZE =================
+      function appendMessage(text, type) {
+        const msg = document.createElement("div");
+        msg.className = "message " + type;
 
-      userInput.addEventListener("input", function () {
-        this.style.height = "auto";
-        this.style.height = this.scrollHeight + "px";
-      });
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
 
-      // ================= ENTER SEND =================
-
-      userInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-
-          sendMessage();
+        if (type === "bot") {
+          bubble.innerHTML = marked.parse(text);
+        } else {
+          bubble.textContent = text;
         }
-      });
 
-      // ================= SEND =================
+        msg.appendChild(bubble);
+        messages.appendChild(msg);
+
+        scrollBottom();
+      }
+
+      function scrollBottom() {
+        const area = document.getElementById("chatArea");
+        area.scrollTop = area.scrollHeight;
+      }
 
       async function sendMessage() {
-        const message = userInput.value.trim();
+        const text = input.value.trim();
 
-        if (!message) return;
+        if (!text) return;
 
-        appendUserMessage(message);
+        welcome.style.display = "none";
 
-        userInput.value = "";
-        userInput.style.height = "auto";
+        appendMessage(text, "user");
 
-        const loading = appendLoading();
+        input.value = "";
+        input.style.height = "auto";
+
+        appendMessage("Mengetik...", "bot");
 
         try {
           const res = await fetch("/chat", {
             method: "POST",
-
             headers: {
               "Content-Type": "application/json",
             },
-
             body: JSON.stringify({
-              message: message,
+              message: text,
             }),
           });
 
-          loading.remove();
-
-          if (!res.ok) {
-            appendBotMessage("⚠️ Server error.");
-
-            return;
-          }
-
           const data = await res.json();
 
-          appendBotMessage(data.reply || "Tidak ada respon.");
+          messages.lastChild.remove();
+
+          appendMessage(data.reply || "⚠️ Tidak ada respon dari AI.", "bot");
         } catch (err) {
-          loading.remove();
+          messages.lastChild.remove();
 
-          appendBotMessage("⚠️ Gagal konek ke server.");
-
-          console.error(err);
+          appendMessage("⚠️ Gagal terhubung ke server.", "bot");
         }
+
+        closeSidebar();
       }
 
-      // ================= USER MESSAGE =================
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
 
-      function appendUserMessage(text) {
-        const row = document.createElement("div");
+      input.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
 
-        row.className = "message-row user";
-
-        row.innerHTML = `
-        <div class="msg-content">
-          <div class="user-bubble">
-            ${escapeHtml(text)}
-          </div>
-        </div>
-      `;
-
-        messagesWrapper.appendChild(row);
-
-        scrollBottom();
-      }
-
-      // ================= BOT LOADING =================
-
-      function appendLoading() {
-        const row = document.createElement("div");
-
-        row.className = "message-row";
-
-        row.innerHTML = `
-        <div class="msg-avatar">
-          P
-        </div>
-
-        <div class="msg-content">
-
-          <div class="loading">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-        </div>
-      `;
-
-        messagesWrapper.appendChild(row);
-
-        scrollBottom();
-
-        return row;
-      }
-
-      // ================= BOT MESSAGE =================
-
-      function appendBotMessage(text) {
-        const row = document.createElement("div");
-
-        row.className = "message-row";
-
-        row.innerHTML = `
-        <div class="msg-avatar">
-          P
-        </div>
-
-        <div class="msg-content">
-
-          <div class="bot-text">
-            ${marked.parse(text)}
-          </div>
-
-        </div>
-      `;
-
-        messagesWrapper.appendChild(row);
-
-        scrollBottom();
-      }
-
-      // ================= ESCAPE =================
-
-      function escapeHtml(text) {
-        return text
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-      }
-
-      // ================= SCROLL =================
-
-      function scrollBottom() {
-        chatArea.scrollTop = chatArea.scrollHeight;
-      }
+      // Tutup sidebar otomatis kalau resize ke desktop
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+          closeSidebar();
+        }
+      });
     </script>
   </body>
 </html>
