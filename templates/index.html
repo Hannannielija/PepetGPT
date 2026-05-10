@@ -15,7 +15,7 @@
         --text-muted: #8e8ea0;
         --user-bubble: #2f2f2f;
         --accent: #19c37d;
-        --btn-hover: #3f3f3f;
+        --btn-hover: #3a3a3a;
       }
 
       * {
@@ -28,9 +28,9 @@
         font-family: Arial, sans-serif;
         background: var(--bg);
         color: var(--text);
-        display: flex;
         height: 100vh;
         overflow: hidden;
+        display: flex;
       }
 
       /* ================= SIDEBAR ================= */
@@ -41,62 +41,62 @@
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        transition: all 0.3s ease;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-
-      .sidebar.closed {
-        width: 0;
-        border-right: none;
+        transition: transform 0.3s ease;
+        z-index: 1000;
       }
 
       .sidebar-header {
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px;
-        border-bottom: 1px solid var(--border);
       }
 
       .sidebar-title {
         font-size: 18px;
         font-weight: bold;
-        white-space: nowrap;
       }
 
-      .icon-btn {
-        background: transparent;
-        border: none;
-        color: var(--text);
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 8px;
-        transition: 0.2s;
-      }
-
-      .icon-btn:hover {
-        background: var(--btn-hover);
-      }
-
-      .chat-list {
+      .sidebar-content {
         padding: 10px;
-        overflow-y: auto;
         flex: 1;
+        overflow-y: auto;
       }
 
       .chat-item {
-        padding: 10px;
+        padding: 12px;
         border-radius: 10px;
         cursor: pointer;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        background: transparent;
         color: var(--text-muted);
         transition: 0.2s;
+        user-select: none;
       }
 
       .chat-item:hover {
         background: var(--btn-hover);
         color: var(--text);
+      }
+
+      .chat-item.active {
+        background: var(--btn-hover);
+        color: var(--text);
+      }
+
+      /* ================= OVERLAY ================= */
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 999;
+      }
+
+      .overlay.show {
+        display: block;
       }
 
       /* ================= MAIN ================= */
@@ -113,8 +113,8 @@
         border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
-        padding: 0 14px;
         gap: 10px;
+        padding: 0 14px;
         flex-shrink: 0;
       }
 
@@ -123,21 +123,40 @@
         font-weight: bold;
       }
 
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border: none;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+
+      .icon-btn:hover {
+        background: var(--btn-hover);
+      }
+
+      /* ================= CHAT ================= */
+
       .chat-area {
         flex: 1;
         overflow-y: auto;
-        padding: 20px;
+        padding: 20px 14px;
       }
 
       .messages-wrapper {
+        width: 100%;
         max-width: 800px;
         margin: auto;
       }
 
       .message-row {
         display: flex;
-        margin-bottom: 18px;
         gap: 10px;
+        margin-bottom: 20px;
       }
 
       .message-row.user {
@@ -158,7 +177,7 @@
       }
 
       .msg-content {
-        max-width: 80%;
+        max-width: 85%;
       }
 
       .user-bubble {
@@ -183,14 +202,14 @@
       }
 
       .bot-text code {
-        color: #f5d67b;
+        color: #f7d774;
       }
 
       /* ================= INPUT ================= */
 
       .input-area {
-        padding: 14px;
         border-top: 1px solid var(--border);
+        padding: 14px;
         flex-shrink: 0;
       }
 
@@ -200,18 +219,18 @@
         background: var(--input-bg);
         border: 1px solid var(--border);
         border-radius: 16px;
-        display: flex;
-        align-items: flex-end;
         padding: 10px;
+        display: flex;
         gap: 10px;
+        align-items: flex-end;
       }
 
       textarea {
         flex: 1;
         background: transparent;
         border: none;
-        resize: none;
         outline: none;
+        resize: none;
         color: white;
         font-size: 15px;
         max-height: 180px;
@@ -219,18 +238,15 @@
       }
 
       .send-btn {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border: none;
         border-radius: 10px;
         cursor: pointer;
         background: white;
         color: black;
-        font-weight: bold;
-      }
-
-      .send-btn:hover {
-        opacity: 0.9;
+        font-size: 18px;
+        flex-shrink: 0;
       }
 
       /* ================= LOADING ================= */
@@ -238,7 +254,7 @@
       .loading {
         display: flex;
         gap: 4px;
-        margin-top: 6px;
+        margin-top: 8px;
       }
 
       .loading span {
@@ -275,35 +291,49 @@
       @media (max-width: 768px) {
         .sidebar {
           position: fixed;
-          z-index: 999;
-          height: 100%;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          transform: translateX(-100%);
         }
 
-        .sidebar.closed {
-          transform: translateX(-100%);
-          width: 260px;
+        .sidebar.show {
+          transform: translateX(0);
         }
 
         .msg-content {
-          max-width: 90%;
+          max-width: 92%;
+        }
+
+        .chat-area {
+          padding: 14px 10px;
+        }
+
+        .input-area {
+          padding: 10px;
+        }
+
+        .topbar {
+          padding: 0 10px;
         }
       }
     </style>
   </head>
 
   <body>
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-title">PepetGPT</div>
 
-        <button class="icon-btn" onclick="toggleSidebar()">✕</button>
+        <button class="icon-btn" onclick="closeSidebar()">✕</button>
       </div>
 
-      <div class="chat-list">
-        <div class="chat-item">Chat Baru</div>
-        <div class="chat-item">Belajar Python</div>
-        <div class="chat-item">Rumus Matematika</div>
+      <div class="sidebar-content">
+        <div class="chat-item active" onclick="newChat()">+ Chat Baru</div>
       </div>
     </div>
 
@@ -311,8 +341,7 @@
     <div class="main">
       <!-- TOPBAR -->
       <div class="topbar">
-        <!-- OPEN BUTTON -->
-        <button class="icon-btn" onclick="toggleSidebar()">☰</button>
+        <button class="icon-btn" onclick="openSidebar()">☰</button>
 
         <div class="topbar-title">PepetGPT</div>
       </div>
@@ -327,8 +356,8 @@
         <div class="input-wrapper">
           <textarea
             id="userInput"
-            placeholder="Tanyakan sesuatu..."
             rows="1"
+            placeholder="Tanyakan sesuatu..."
           ></textarea>
 
           <button class="send-btn" onclick="sendMessage()">↑</button>
@@ -341,22 +370,30 @@
 
     <script>
       const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+
       const userInput = document.getElementById("userInput");
       const messagesWrapper = document.getElementById("messagesWrapper");
       const chatArea = document.getElementById("chatArea");
 
-      let isSidebarOpen = true;
-
       // ================= SIDEBAR =================
 
-      function toggleSidebar() {
-        isSidebarOpen = !isSidebarOpen;
+      function openSidebar() {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+      }
 
-        if (isSidebarOpen) {
-          sidebar.classList.remove("closed");
-        } else {
-          sidebar.classList.add("closed");
-        }
+      function closeSidebar() {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+      }
+
+      // ================= NEW CHAT =================
+
+      function newChat() {
+        messagesWrapper.innerHTML = "";
+
+        closeSidebar();
       }
 
       // ================= AUTO RESIZE =================
@@ -371,6 +408,7 @@
       userInput.addEventListener("keydown", function (e) {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
+
           sendMessage();
         }
       });
@@ -392,9 +430,11 @@
         try {
           const res = await fetch("/chat", {
             method: "POST",
+
             headers: {
               "Content-Type": "application/json",
             },
+
             body: JSON.stringify({
               message: message,
             }),
@@ -404,6 +444,7 @@
 
           if (!res.ok) {
             appendBotMessage("⚠️ Server error.");
+
             return;
           }
 
@@ -428,7 +469,9 @@
 
         row.innerHTML = `
         <div class="msg-content">
-          <div class="user-bubble">${escapeHtml(text)}</div>
+          <div class="user-bubble">
+            ${escapeHtml(text)}
+          </div>
         </div>
       `;
 
@@ -445,14 +488,18 @@
         row.className = "message-row";
 
         row.innerHTML = `
-        <div class="msg-avatar">P</div>
+        <div class="msg-avatar">
+          P
+        </div>
 
         <div class="msg-content">
+
           <div class="loading">
             <span></span>
             <span></span>
             <span></span>
           </div>
+
         </div>
       `;
 
@@ -470,13 +517,17 @@
 
         row.className = "message-row";
 
-        const safeHtml = marked.parse(text);
-
         row.innerHTML = `
-        <div class="msg-avatar">P</div>
+        <div class="msg-avatar">
+          P
+        </div>
 
         <div class="msg-content">
-          <div class="bot-text">${safeHtml}</div>
+
+          <div class="bot-text">
+            ${marked.parse(text)}
+          </div>
+
         </div>
       `;
 
