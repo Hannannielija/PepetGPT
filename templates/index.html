@@ -54,8 +54,16 @@
         display: flex;
         flex-direction: column;
         flex-shrink: 0;
-        transition: transform 0.25s ease;
+        transition:
+          transform 0.25s ease,
+          width 0.25s ease;
         z-index: 1000;
+      }
+
+      .sidebar.closed {
+        width: 0;
+        overflow: hidden;
+        border-right: none;
       }
 
       .sidebar-header {
@@ -75,6 +83,7 @@
         flex: 1;
         overflow-y: auto;
         padding: 10px;
+        min-width: 260px; /* Menjaga konten tetap rapi saat transisi width */
       }
 
       .new-chat-btn {
@@ -110,6 +119,7 @@
       .sidebar-footer {
         border-top: 1px solid var(--border);
         padding: 14px;
+        min-width: 260px;
       }
 
       .user-box {
@@ -378,6 +388,21 @@
         </button>
 
         <div class="topbar-title">PepetGPT</div>
+        <button
+          id="desktopToggle"
+          onclick="toggleDesktopSidebar()"
+          style="
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+          "
+        >
+          ☰
+        </button>
       </div>
 
       <div class="chat-area" id="chatArea">
@@ -415,13 +440,29 @@
       let chatCount = 1;
 
       function openSidebar() {
-        sidebar.classList.add("open");
-        overlay.classList.add("active");
+        if (window.innerWidth <= 768) {
+          sidebar.classList.add("open");
+          overlay.classList.add("active");
+        } else {
+          sidebar.classList.remove("closed");
+        }
       }
 
       function closeSidebar() {
-        sidebar.classList.remove("open");
-        overlay.classList.remove("active");
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove("open");
+          overlay.classList.remove("active");
+        } else {
+          sidebar.classList.add("closed");
+        }
+      }
+
+      function toggleDesktopSidebar() {
+        if (window.innerWidth > 768) {
+          sidebar.classList.toggle("closed");
+        } else {
+          openSidebar();
+        }
       }
 
       function newChat() {
@@ -496,7 +537,10 @@
           appendMessage("⚠️ Gagal terhubung ke server.", "bot");
         }
 
-        closeSidebar();
+        // Jangan tutup sidebar di desktop saat kirim pesan jika tidak diinginkan
+        if (window.innerWidth <= 768) {
+          closeSidebar();
+        }
       }
 
       input.addEventListener("keydown", function (e) {
@@ -511,10 +555,10 @@
         this.style.height = this.scrollHeight + "px";
       });
 
-      // Tutup sidebar otomatis kalau resize ke desktop
       window.addEventListener("resize", () => {
         if (window.innerWidth > 768) {
-          closeSidebar();
+          overlay.classList.remove("active");
+          sidebar.classList.remove("open");
         }
       });
     </script>
