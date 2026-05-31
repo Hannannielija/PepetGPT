@@ -214,8 +214,8 @@
         position: fixed;
         bottom: 10px;
         left: 15px;
-        font-size: 11px;
-        color: #555;
+        font-size: 12px;
+        color: #aaa;
         font-family: Arial, sans-serif;
         z-index: 998;
         pointer-events: none;
@@ -308,7 +308,7 @@
       const historyBox= document.getElementById("chatHistory");
 
       let chatCount = 1;
-      let conversationHistory = []; // simpan history buat context AI
+
 
       function isMobile() { return window.innerWidth <= 768; }
 
@@ -379,36 +379,21 @@
 
         appendMessage("Bentar ya, gue lagi mikir... 🤔", "bot");
 
-        // Tambahkan user message ke history
-        conversationHistory.push({ role: "user", content: text });
-
         try {
           const res = await fetch("/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: text,
-              history: conversationHistory.slice(0, -1) // kirim history sebelum pesan terakhir
-            })
+            body: JSON.stringify({ message: text })
           });
 
           const data = await res.json();
           messages.lastChild.remove();
 
-          const reply = data.reply || "⚠️ Gak ada respon, mungkin servernya lagi di-restart kali bro.";
-          appendMessage(reply, "bot");
-
-          // Simpan reply AI ke history
-          conversationHistory.push({ role: "assistant", content: reply });
-
-          // Batasi history 20 pesan biar gak overload
-          if (conversationHistory.length > 20) {
-            conversationHistory = conversationHistory.slice(-20);
-          }
+          appendMessage(data.reply || "⚠️ Gak ada respon, mungkin servernya lagi di-restart kali bro.", "bot");
 
         } catch (err) {
           messages.lastChild.remove();
-          appendMessage("⚠️ Gagal konek ke server. Mungkin jaringannya bermasalah, cek dulu bro!", "bot");
+          appendMessage("⚠️ Gagal konek ke server. Cek jaringan dulu bro!", "bot");
         }
 
         if (isMobile()) closeSidebar();
